@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/IBM/sarama v1.45.0
+	github.com/edsrzf/mmap-go v1.2.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/moby/moby/api v1.52.0-rc.1
 	github.com/moby/moby/client v0.1.0-rc.1
@@ -26,7 +27,6 @@ require (
 	github.com/eapache/go-resiliency v1.7.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
