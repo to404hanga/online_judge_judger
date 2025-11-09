@@ -7,12 +7,11 @@ import (
 )
 
 type JudgeTask struct {
-	SubmissionID string
-	SourceCode   string
-	Language     ojmodel.SubmissionLanguage
-	TimeLimit    int    // Milliseconds
-	MemoryLimit  int    // Megabytes
-	ProblemID    uint64 // 题目ID
+	SourceCode  string
+	Language    ojmodel.SubmissionLanguage
+	TimeLimit   int    // Milliseconds
+	MemoryLimit int    // Megabytes
+	ProblemID   uint64 // 题目ID
 }
 
 type CompileResult struct {
