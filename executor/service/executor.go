@@ -151,11 +151,11 @@ func (e *DockerExecutor) Compile(ctx context.Context, task *JudgeTask) (*Compile
 	}
 }
 
-func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseNum int, compiledArtifactPath string) (*ExecuteResult, error) {
+func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcasePath, compiledArtifactPath string) (*ExecuteResult, error) {
 	// 获取对应编程语言的配置信息
 	cfg, ok := config.LanguageConfigs[task.Language]
 	if !ok {
-		return &ExecuteResult{ExitCode: -1, Stderr: fmt.Sprintf("unsupported language: %v", task.Language)}, nil
+		return &ExecuteResult{Stderr: fmt.Sprintf("unsupported language: %v", task.Language)}, nil
 	}
 
 	// 确保Docker镜像已准备就绪
@@ -202,8 +202,7 @@ func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseN
 	}
 
 	// 1. 从executor容器复制测试用例输入文件到执行容器
-	inputSrcPath := fmt.Sprintf("./%d/%d.in", task.ProblemID, testcaseNum)
-	inputContent, err := os.ReadFile(inputSrcPath)
+	inputContent, err := os.ReadFile(testcasePath)
 	if err != nil {
 		healthy = false
 		return nil, fmt.Errorf("read input file failed: %w", err)
@@ -236,13 +235,13 @@ func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseN
 
 	var expected mmap.MMap
 	var expectedErr error
-	expectedFile := fmt.Sprintf("./%d/%d.out", task.ProblemID, testcaseNum)
+	expectedFilePath := strings.Replace(testcasePath, ".in", ".out", 1)
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var file *os.File
-		file, expectedErr = os.OpenFile(expectedFile, os.O_RDONLY, 0666)
+		file, expectedErr = os.OpenFile(expectedFilePath, os.O_RDONLY, 0666)
 		if expectedErr != nil {
 			return
 		}
@@ -266,7 +265,7 @@ func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseN
 	// 记录开始执行时间
 	startAt := time.Now()
 	// 在容器中执行程序
-	stdout, stderr, exitCode, err := e.execWithAttach(runCtx, workerID, modifiedRunCommand, workDirInContainer)
+	stdout, stderr, _, err := e.execWithAttach(runCtx, workerID, modifiedRunCommand, workDirInContainer)
 	// 计算执行耗时
 	timeUsed := time.Since(startAt).Milliseconds()
 
@@ -278,7 +277,6 @@ func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseN
 		Stderr:     stderr,           // 标准错误
 		TimeUsed:   timeUsed,         // 执行耗时（毫秒）
 		MemoryUsed: maxMemory / 1024, // 内存使用（KB）
-		ExitCode:   exitCode,         // 退出码
 	}
 
 	// 如果执行超时，标记运行超时

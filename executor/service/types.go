@@ -26,11 +26,10 @@ type ExecuteResult struct {
 	Stderr     string
 	TimeUsed   int64 // Milliseconds
 	MemoryUsed int64 // Kilobytes
-	ExitCode   int
 }
 
 type Executor interface {
 	Compile(ctx context.Context, task *JudgeTask) (*CompileResult, error)
-	Execute(ctx context.Context, task *JudgeTask, testcaseNum int, compiledArtifactPath string) (*ExecuteResult, error)
+	Execute(ctx context.Context, task *JudgeTask, testcasePath, compiledArtifactPath string) (*ExecuteResult, error)
 	Close(ctx context.Context) error
 }
