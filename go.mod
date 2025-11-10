@@ -9,7 +9,7 @@ require (
 	github.com/moby/moby/api v1.52.0-rc.1
 	github.com/moby/moby/client v0.1.0-rc.1
 	github.com/redis/go-redis/v9 v9.7.0
-	github.com/to404hanga/online_judge_common v0.0.10
+	github.com/to404hanga/online_judge_common v0.0.11
 	github.com/to404hanga/pkg404 v0.0.34
 	gorm.io/gorm v1.25.12
 )
