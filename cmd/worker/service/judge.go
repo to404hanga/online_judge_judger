@@ -33,12 +33,12 @@ type JudgeService struct {
 	db                *gorm.DB
 	rdb               redis.Cmdable
 	judger            executor.Judger
-	kafka             event.Producer
+	producer          event.Producer
 	consumerName      string
 	xAutoClaimTimeout time.Duration
 }
 
-func NewJudgeService(log loggerv2.Logger, db *gorm.DB, rdb redis.Cmdable, kafka event.Producer, containerPoolSize, compileTimeoutSeconds, defaultMemoryLimitMB, xAutoClaimTimeoutMinutes int, testcasePathPrefix string) *JudgeService {
+func NewJudgeService(log loggerv2.Logger, db *gorm.DB, rdb redis.Cmdable, producer event.Producer, containerPoolSize, compileTimeoutSeconds, defaultMemoryLimitMB, xAutoClaimTimeoutMinutes int, testcasePathPrefix string) *JudgeService {
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Error("failed to get hostname", logger.Error(err))
@@ -48,7 +48,7 @@ func NewJudgeService(log loggerv2.Logger, db *gorm.DB, rdb redis.Cmdable, kafka 
 		log:               log,
 		db:                db,
 		rdb:               rdb,
-		kafka:             kafka,
+		producer:          producer,
 		judger:            executor.NewDockerJudger(log, containerPoolSize, compileTimeoutSeconds, defaultMemoryLimitMB, testcasePathPrefix),
 		consumerName:      fmt.Sprintf("%s-%d", hostname, time.Now().UnixNano()),
 		xAutoClaimTimeout: time.Duration(xAutoClaimTimeoutMinutes) * time.Minute,
@@ -163,7 +163,7 @@ func (s *JudgeService) handleJudgeTask(ctx context.Context, task *judgetask.Judg
 		return fmt.Errorf("failed to marshal judge result: %w", err)
 	}
 
-	_, _, err = s.kafka.Produce(ctx, &sarama.ProducerMessage{
+	_, _, err = s.producer.Produce(ctx, &sarama.ProducerMessage{
 		Topic: ojconstants.JudgeResultTopic,
 		Value: sarama.ByteEncoder(val),
 	})

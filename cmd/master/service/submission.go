@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	problemKey = "problem:%d"
+	problemKey                    = "problem:%d"
+	JudgerMasterSubmissionGroupID = "judger_master_submission_group"
 )
 
 type SubmissionService struct {
