@@ -13,6 +13,8 @@ func InitKafka() sarama.Client {
 		panic(err)
 	}
 	saramaCfg := sarama.NewConfig()
+	// SyncProducer 必须启用成功回执，否则会 panic
+	saramaCfg.Producer.Return.Successes = true
 	client, err := sarama.NewClient(cfg.Brokers, saramaCfg)
 	if err != nil {
 		panic(err)
