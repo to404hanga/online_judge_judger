@@ -20,7 +20,7 @@ type DBConfig struct {
 	Port        int    `yaml:"port"`
 	Username    string `yaml:"username"`
 	Password    string `yaml:"password"`
-	DBName      string `yaml:"database"`
+	DBName      string `yaml:"dbName"`
 	TablePrefix string `yaml:"tablePrefix"`
 	// 连接池配置
 	MaxOpenConns    int `yaml:"maxOpenConns"`    // 最大打开连接数

@@ -29,13 +29,14 @@ const (
 )
 
 type JudgeService struct {
-	log               loggerv2.Logger
-	db                *gorm.DB
-	rdb               redis.Cmdable
-	judger            executor.Judger
-	producer          event.Producer
-	consumerName      string
-	xAutoClaimTimeout time.Duration
+	log                loggerv2.Logger
+	db                 *gorm.DB
+	rdb                redis.Cmdable
+	judger             executor.Judger
+	producer           event.Producer
+	consumerName       string
+	xAutoClaimTimeout  time.Duration
+	testcasePathPrefix string
 }
 
 func NewJudgeService(log loggerv2.Logger, db *gorm.DB, rdb redis.Cmdable, producer event.Producer, containerPoolSize, compileTimeoutSeconds, defaultMemoryLimitMB, xAutoClaimTimeoutMinutes int, testcasePathPrefix string) *JudgeService {
@@ -45,13 +46,14 @@ func NewJudgeService(log loggerv2.Logger, db *gorm.DB, rdb redis.Cmdable, produc
 		panic(err)
 	}
 	return &JudgeService{
-		log:               log,
-		db:                db,
-		rdb:               rdb,
-		producer:          producer,
-		judger:            executor.NewDockerJudger(log, containerPoolSize, compileTimeoutSeconds, defaultMemoryLimitMB, testcasePathPrefix),
-		consumerName:      fmt.Sprintf("%s-%d", hostname, time.Now().UnixNano()),
-		xAutoClaimTimeout: time.Duration(xAutoClaimTimeoutMinutes) * time.Minute,
+		log:                log,
+		db:                 db,
+		rdb:                rdb,
+		producer:           producer,
+		judger:             executor.NewDockerJudger(log, containerPoolSize, compileTimeoutSeconds, defaultMemoryLimitMB, testcasePathPrefix),
+		consumerName:       fmt.Sprintf("%s-%d", hostname, time.Now().UnixNano()),
+		xAutoClaimTimeout:  time.Duration(xAutoClaimTimeoutMinutes) * time.Minute,
+		testcasePathPrefix: testcasePathPrefix,
 	}
 }
 

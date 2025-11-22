@@ -9,7 +9,7 @@ db:
   port: 3306
   username: oj
   password: "123456"
-  database: online_judge
+  dbName: online_judge
   tablePrefix: ""
   maxOpenConns: 10
   maxIdleConns: 10
@@ -31,5 +31,4 @@ judgerWorker:
   compileTimeoutSeconds: 60
   defaultMemoryLimitMB: 256
   xAutoClaimTimeoutMinutes: 5
-  testcasePathPrefix: "/root/testcases"
-
+  testcasePathPrefix: "/testcases"

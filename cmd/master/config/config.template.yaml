@@ -3,7 +3,7 @@ db:
   port: 3306
   username: "oj"
   password: "123456"
-  database: "online_judge"
+  dbName: "online_judge"
   tablePrefix: ""
   # 连接池配置
   maxOpenConns: 100      # 最大打开连接数
