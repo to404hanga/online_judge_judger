@@ -12,7 +12,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
-	github.com/to404hanga/online_judge_common v0.0.12
+	github.com/to404hanga/online_judge_common v0.0.13
 	github.com/to404hanga/online_judge_controller v0.0.1
 	github.com/to404hanga/pkg404 v0.0.34
 	gorm.io/driver/mysql v1.6.0
