@@ -10,7 +10,7 @@ import (
 	ojmodel "github.com/to404hanga/online_judge_common/model"
 	ojconstants "github.com/to404hanga/online_judge_common/proto/constants"
 	pbjudgeresult "github.com/to404hanga/online_judge_common/proto/gen/judgeresult"
-	"github.com/to404hanga/online_judge_controller/service"
+	ojcservice "github.com/to404hanga/online_judge_controller/service"
 	"github.com/to404hanga/online_judge_judger/consumer"
 	"github.com/to404hanga/pkg404/gotools/retry"
 	"github.com/to404hanga/pkg404/logger"
@@ -18,14 +18,18 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	ResultCollectorGroupID = "result_collector_group"
+)
+
 type ResultCollectorService struct {
 	log        loggerv2.Logger
 	db         *gorm.DB
 	consumer   consumer.Consumer
-	rankingSvc service.RankingService
+	rankingSvc ojcservice.RankingService
 }
 
-func NewResultCollectorService(log loggerv2.Logger, cg sarama.ConsumerGroup, db *gorm.DB, rankingSvc service.RankingService) *ResultCollectorService {
+func NewResultCollectorService(log loggerv2.Logger, cg sarama.ConsumerGroup, db *gorm.DB, rankingSvc ojcservice.RankingService) *ResultCollectorService {
 	s := &ResultCollectorService{
 		log:        log,
 		db:         db,

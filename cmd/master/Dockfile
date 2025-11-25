@@ -38,8 +38,8 @@ COPY --from=builder /app/main .
 # 创建配置文件目录
 RUN mkdir -p config
 
-# 复制配置文件
-COPY cmd/master/config/config.yaml ./config/
+# # 复制配置文件
+# COPY cmd/master/config/config.yaml ./config/
 
 # 创建日志目录
 RUN mkdir -p log

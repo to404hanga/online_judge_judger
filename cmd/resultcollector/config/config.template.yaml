@@ -1,0 +1,28 @@
+db:
+  host: "localhost"
+  port: 3306
+  username: "oj"
+  password: "123456"
+  dbName: "online_judge"
+  tablePrefix: ""
+  # 连接池配置
+  maxOpenConns: 100      # 最大打开连接数
+  maxIdleConns: 10       # 最大空闲连接数
+  connMaxLifetime: 60    # 连接最大生存时间（分钟）
+  connMaxIdleTime: 10    # 连接最大空闲时间（分钟）
+
+log:
+  development: true
+  type: 1 # 0-控制台, 1-文件, 2-控制台+文件
+  logFilePath: "./log/master.log"
+  autoCreateFile: true
+
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+
+kafka:
+  brokers:
+    - "localhost:9092"
