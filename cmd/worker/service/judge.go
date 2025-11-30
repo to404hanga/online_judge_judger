@@ -103,9 +103,14 @@ func (s *JudgeService) Start(ctx context.Context) error {
 }
 
 func (s *JudgeService) processMessage(ctx context.Context, msg *redis.XMessage) error {
-	taskData, ok := msg.Values["task"].([]byte)
-	if !ok {
-		return fmt.Errorf("task field is not []byte")
+	var taskData []byte
+	switch v := msg.Values["task"].(type) {
+	case string:
+		taskData = []byte(v)
+	case []byte:
+		taskData = v
+	default:
+		return fmt.Errorf("task field is not []byte or string, type: %T", v)
 	}
 
 	var task judgetask.JudgeTask
