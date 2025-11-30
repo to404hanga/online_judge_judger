@@ -5,7 +5,6 @@ go 1.23.4
 require (
 	github.com/IBM/sarama v1.45.0
 	github.com/edsrzf/mmap-go v1.2.0
-	github.com/gogo/protobuf v1.3.2
 	github.com/google/wire v0.7.0
 	github.com/moby/moby/api v1.52.0-rc.1
 	github.com/moby/moby/client v0.1.0-rc.1
@@ -15,6 +14,7 @@ require (
 	github.com/to404hanga/online_judge_common v0.0.15
 	github.com/to404hanga/online_judge_controller v0.0.2
 	github.com/to404hanga/pkg404 v0.0.35
+	google.golang.org/protobuf v1.36.10
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.30.0
 )
@@ -87,5 +87,4 @@ require (
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
-	google.golang.org/protobuf v1.36.10 // indirect
 )

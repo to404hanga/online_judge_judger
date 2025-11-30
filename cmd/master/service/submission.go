@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/IBM/sarama"
-	"github.com/gogo/protobuf/proto"
 	"github.com/redis/go-redis/v9"
 	ojmodel "github.com/to404hanga/online_judge_common/model"
 	ojconstants "github.com/to404hanga/online_judge_common/proto/constants"
@@ -15,6 +14,7 @@ import (
 	"github.com/to404hanga/online_judge_judger/consumer"
 	"github.com/to404hanga/pkg404/cachex/lru"
 	loggerv2 "github.com/to404hanga/pkg404/logger/v2"
+	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )
 
