@@ -299,7 +299,7 @@ func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseP
 	if runtime.GOOS == "windows" {
 		stdout = strings.ReplaceAll(stdout, "\n", "\r\n")
 	}
-	// e.log.DebugContext(ctx, "compare stdout and expected", logger.String("stdout", stdout), logger.String("expected", string(expected)))
+	e.log.DebugContext(ctx, "compare stdout and expected", logger.String("stdout", stdout), logger.String("expected", string(expected)))
 	if bytes.Equal([]byte(stdout), expected) {
 		result.Result = ojmodel.SubmissionResultAccepted
 	} else {

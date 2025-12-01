@@ -19,7 +19,7 @@ func InitDB() *gorm.DB {
 		log.Panicf("unmarshal db config fail, err: %v", err)
 	}
 
-	db, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	db, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Asia%%2FShanghai",
 		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName,
 	)), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
