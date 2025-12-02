@@ -11,7 +11,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
-	github.com/to404hanga/online_judge_common v0.0.17
+	github.com/to404hanga/online_judge_common v0.0.18
 	github.com/to404hanga/online_judge_controller v0.0.2
 	github.com/to404hanga/pkg404 v0.0.35
 	google.golang.org/protobuf v1.36.10
