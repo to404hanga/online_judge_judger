@@ -144,7 +144,7 @@ func (s *ResultCollectorService) UpdateCompetitionUser(ctx context.Context, comp
 	updates := map[string]any{}
 	if isAccepted {
 		updates["pass_count"] = cu.PassCount + 1
-		updates["total_time"] = acceptedTime.UnixMilli() + int64(cu.RetryCount)*service.PenaltyTime
+		updates["total_time"] = acceptedTime.UnixMilli() + int64(cu.RetryCount)*service.PenaltyTime - cu.StartTime.UnixMilli()
 	} else {
 		updates["retry_count"] = cu.RetryCount + 1
 	}
