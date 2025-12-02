@@ -154,8 +154,8 @@ github.com/subosito/gotenv v1.6.0 h1:9NlTDc1FTs4qu0DDq7AEtTPNw6SVm7uBMsUCUjABIf8
 github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSWPKKo0FU=
 github.com/tiendc/go-deepcopy v1.6.0 h1:0UtfV/imoCwlLxVsyfUd4hNHnB3drXsfle+wzSCA5Wo=
 github.com/tiendc/go-deepcopy v1.6.0/go.mod h1:toXoeQoUqXOOS/X4sKuiAoSk6elIdqc0pN7MTgOOo2I=
-github.com/to404hanga/online_judge_common v0.0.15 h1:ybDlydoBoUnIEa+Dv7iuqOnAu8ksi0eMzFOlJPMtPFo=
-github.com/to404hanga/online_judge_common v0.0.15/go.mod h1:9Ays/uVxkrZugD0VMicAR7iSSRODsm0d6YAerrzyJPc=
+github.com/to404hanga/online_judge_common v0.0.16 h1:h3xB24EdiAJrqj/HQ+i/Pds5wE2BYO6nZUeFYjyvqxM=
+github.com/to404hanga/online_judge_common v0.0.16/go.mod h1:9Ays/uVxkrZugD0VMicAR7iSSRODsm0d6YAerrzyJPc=
 github.com/to404hanga/online_judge_controller v0.0.2 h1:/LGHDRyiSMGUbc6/FKrWueetv+0D71ygSB/HUW0aZ6o=
 github.com/to404hanga/online_judge_controller v0.0.2/go.mod h1:sX/VINn/Cnms0B4iEigwSSLd1Fe/UixGke0tYrYBBpw=
 github.com/to404hanga/pkg404 v0.0.35 h1:wOZjTaauoOMBGJ8QtrSxZbZ2gNZcj81147USTBm41+I=

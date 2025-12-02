@@ -9,6 +9,7 @@ import (
 	ojmodel "github.com/to404hanga/online_judge_common/model"
 	ojconstants "github.com/to404hanga/online_judge_common/proto/constants"
 	pbjudgeresult "github.com/to404hanga/online_judge_common/proto/gen/judgeresult"
+	"github.com/to404hanga/online_judge_controller/service"
 	ojcservice "github.com/to404hanga/online_judge_controller/service"
 	"github.com/to404hanga/online_judge_judger/consumer"
 	"github.com/to404hanga/pkg404/gotools/retry"
@@ -94,6 +95,17 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 	}
 
 	err = retry.Do(collectorCtx, func() error {
+		errInternal := s.UpdateCompetitionUser(collectorCtx, submission.CompetitionID, submission.UserID, ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted, submission.CreatedAt)
+		if errInternal != nil {
+			return fmt.Errorf("failed to update competition user: %w", errInternal)
+		}
+		return nil
+	}, retry.WithBaseInterval(time.Second))
+	if err != nil {
+		return fmt.Errorf("failed to update competition user: %w", err)
+	}
+
+	err = retry.Do(collectorCtx, func() error {
 		errInternal := s.rankingSvc.UpdateUserScore(collectorCtx, submission.CompetitionID, submission.ProblemID, submission.UserID, ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted, submission.CreatedAt)
 		if errInternal != nil {
 			return fmt.Errorf("failed to update user score: %w", errInternal)
@@ -102,6 +114,47 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
 		return fmt.Errorf("failed to update user score: %w", err)
+	}
+
+	return nil
+}
+
+func (s *ResultCollectorService) UpdateCompetitionUser(ctx context.Context, competitionID, userID uint64, isAccepted bool, acceptedTime time.Time) (err error) {
+	tx := s.db.WithContext(ctx).Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+		err = tx.Commit().Error
+		if err != nil {
+			err = fmt.Errorf("failed to commit transaction: %w", err)
+			tx.Rollback()
+		}
+	}()
+
+	var cu ojmodel.CompetitionUser
+	err = tx.Model(&ojmodel.CompetitionUser{}).
+		Where("competition_id = ?", competitionID).
+		Where("user_id = ?", userID).
+		First(&cu).Error
+	if err != nil {
+		return fmt.Errorf("failed to pluck pass count: %w", err)
+	}
+
+	updates := map[string]any{}
+	if isAccepted {
+		updates["pass_count"] = cu.PassCount + 1
+		updates["total_time"] = acceptedTime.UnixMilli() + int64(cu.RetryCount)*service.PenaltyTime
+	} else {
+		updates["retry_count"] = cu.RetryCount + 1
+	}
+
+	err = tx.Model(&ojmodel.CompetitionUser{}).
+		Where("competition_id = ?", competitionID).
+		Where("user_id = ?", userID).
+		Updates(updates).Error
+	if err != nil {
+		return fmt.Errorf("failed to update competition user: %w", err)
 	}
 
 	return nil
