@@ -156,8 +156,8 @@ github.com/tiendc/go-deepcopy v1.6.0 h1:0UtfV/imoCwlLxVsyfUd4hNHnB3drXsfle+wzSCA
 github.com/tiendc/go-deepcopy v1.6.0/go.mod h1:toXoeQoUqXOOS/X4sKuiAoSk6elIdqc0pN7MTgOOo2I=
 github.com/to404hanga/online_judge_common v0.0.18 h1:Pwf75NW0UPHRjRFmoM6K0tJYIKBAZVq3HbLk4PC4g5o=
 github.com/to404hanga/online_judge_common v0.0.18/go.mod h1:9Ays/uVxkrZugD0VMicAR7iSSRODsm0d6YAerrzyJPc=
-github.com/to404hanga/online_judge_controller v0.0.2 h1:/LGHDRyiSMGUbc6/FKrWueetv+0D71ygSB/HUW0aZ6o=
-github.com/to404hanga/online_judge_controller v0.0.2/go.mod h1:sX/VINn/Cnms0B4iEigwSSLd1Fe/UixGke0tYrYBBpw=
+github.com/to404hanga/online_judge_controller v0.0.3 h1:CTKB8NnVo1u8Wauk86FbsngnnXEe+csXH5+xazG6ulc=
+github.com/to404hanga/online_judge_controller v0.0.3/go.mod h1:+ac5/dzgdtrXWmDwf8xvk/fjul5UMNdKBKw9waUw+AU=
 github.com/to404hanga/pkg404 v0.0.35 h1:wOZjTaauoOMBGJ8QtrSxZbZ2gNZcj81147USTBm41+I=
 github.com/to404hanga/pkg404 v0.0.35/go.mod h1:ZJVpQFW/NZtgshGqyCwZ7Te7uD8g3/1Js94M9almKj0=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=

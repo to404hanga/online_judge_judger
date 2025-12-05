@@ -94,11 +94,13 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 		return fmt.Errorf("failed to get submission: %w", err)
 	}
 
+	var startTime time.Time
 	err = retry.Do(collectorCtx, func() error {
-		errInternal := s.UpdateCompetitionUser(collectorCtx, submission.CompetitionID, submission.UserID, ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted, submission.CreatedAt)
+		t, errInternal := s.updateCompetitionUser(collectorCtx, submission.CompetitionID, submission.UserID, ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted, submission.CreatedAt)
 		if errInternal != nil {
 			return fmt.Errorf("failed to update competition user: %w", errInternal)
 		}
+		startTime = t
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
@@ -106,7 +108,15 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 	}
 
 	err = retry.Do(collectorCtx, func() error {
-		errInternal := s.rankingSvc.UpdateUserScore(collectorCtx, submission.CompetitionID, submission.ProblemID, submission.UserID, ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted, submission.CreatedAt)
+		errInternal := s.rankingSvc.UpdateUserScore(
+			collectorCtx,
+			submission.CompetitionID,
+			submission.ProblemID,
+			submission.UserID,
+			ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted,
+			submission.CreatedAt,
+			startTime,
+		)
 		if errInternal != nil {
 			return fmt.Errorf("failed to update user score: %w", errInternal)
 		}
@@ -119,7 +129,7 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 	return nil
 }
 
-func (s *ResultCollectorService) UpdateCompetitionUser(ctx context.Context, competitionID, userID uint64, isAccepted bool, acceptedTime time.Time) (err error) {
+func (s *ResultCollectorService) updateCompetitionUser(ctx context.Context, competitionID, userID uint64, isAccepted bool, acceptedTime time.Time) (startTime time.Time, err error) {
 	tx := s.db.WithContext(ctx).Begin()
 	defer func() {
 		if err != nil {
@@ -138,7 +148,7 @@ func (s *ResultCollectorService) UpdateCompetitionUser(ctx context.Context, comp
 		Where("user_id = ?", userID).
 		First(&cu).Error
 	if err != nil {
-		return fmt.Errorf("failed to pluck pass count: %w", err)
+		return time.Time{}, fmt.Errorf("failed to pluck pass count: %w", err)
 	}
 
 	updates := map[string]any{}
@@ -154,8 +164,8 @@ func (s *ResultCollectorService) UpdateCompetitionUser(ctx context.Context, comp
 		Where("user_id = ?", userID).
 		Updates(updates).Error
 	if err != nil {
-		return fmt.Errorf("failed to update competition user: %w", err)
+		return time.Time{}, fmt.Errorf("failed to update competition user: %w", err)
 	}
 
-	return nil
+	return cu.StartTime, nil
 }
