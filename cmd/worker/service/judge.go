@@ -72,6 +72,7 @@ func (s *JudgeService) Start(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
+			s.judger.Close()
 			return ctx.Err()
 		default:
 			streamMsg, err := s.rdb.XReadGroup(ctx, &redis.XReadGroupArgs{

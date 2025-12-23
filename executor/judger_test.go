@@ -14,7 +14,7 @@ func TestRun(t *testing.T) {
 	l := loggerv2.GetGlobalLogger()
 	ctx := context.Background()
 	judger := NewDockerJudger(l, 2, 10, 128, ".")
-	defer judger.Close(ctx)
+	defer judger.Close()
 
 	task := &service.JudgeTask{
 		ProblemID:   1,

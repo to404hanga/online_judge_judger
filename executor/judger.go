@@ -14,7 +14,7 @@ import (
 
 type Judger interface {
 	Run(ctx context.Context, task *service.JudgeTask) (*service.ExecuteResult, error)
-	Close(ctx context.Context) error
+	Close() error
 }
 
 type DockerJudger struct {
@@ -86,6 +86,6 @@ func (j *DockerJudger) GetTestcaseList(ctx context.Context, problemID uint64) ([
 	return files, nil
 }
 
-func (j *DockerJudger) Close(ctx context.Context) error {
-	return j.executor.Close(ctx)
+func (j *DockerJudger) Close() error {
+	return j.executor.Close()
 }

@@ -30,5 +30,5 @@ type ExecuteResult struct {
 type Executor interface {
 	Compile(ctx context.Context, task *JudgeTask) (*CompileResult, error)
 	Execute(ctx context.Context, task *JudgeTask, testcasePath, compiledArtifactPath string) (*ExecuteResult, error)
-	Close(ctx context.Context) error
+	Close() error
 }

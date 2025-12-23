@@ -309,7 +309,8 @@ func (e *DockerExecutor) Execute(ctx context.Context, task *JudgeTask, testcaseP
 	return result, nil
 }
 
-func (e *DockerExecutor) Close(ctx context.Context) error {
+func (e *DockerExecutor) Close() error {
+	ctx := context.Background()
 	for _, ch := range e.containerPool {
 		close(ch)
 		for id := range ch {
