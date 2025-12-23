@@ -117,8 +117,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 h1:N/ElC8H3+5XpJzTSTfLsJV/mx9Q9g7kxmchpfZyxgzM=
 github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
-github.com/redis/go-redis/v9 v9.7.0/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
+github.com/redis/go-redis/v9 v9.7.3 h1:YpPyAayJV+XErNsatSElgRZZVCwXX9QzkKYNvO7x0wM=
+github.com/redis/go-redis/v9 v9.7.3/go.mod h1:bGUrSggJ9X9GUmZpZNEOQKaANxSGgOEBRltRTZHSvrA=
 github.com/richardlehane/mscfb v1.0.4 h1:WULscsljNPConisD5hR0+OyZjwK46Pfyr6mPu5ZawpM=
 github.com/richardlehane/mscfb v1.0.4/go.mod h1:YzVpcZg9czvAuhk9T+a3avCpcFPMUWm7gK3DypaEsUk=
 github.com/richardlehane/msoleps v1.0.1/go.mod h1:BWev5JBpU9Ko2WAgmZEuiz4/u3ZYTKbjLycmwiWUfWg=
@@ -156,8 +156,8 @@ github.com/tiendc/go-deepcopy v1.6.0 h1:0UtfV/imoCwlLxVsyfUd4hNHnB3drXsfle+wzSCA
 github.com/tiendc/go-deepcopy v1.6.0/go.mod h1:toXoeQoUqXOOS/X4sKuiAoSk6elIdqc0pN7MTgOOo2I=
 github.com/to404hanga/online_judge_common v0.0.18 h1:Pwf75NW0UPHRjRFmoM6K0tJYIKBAZVq3HbLk4PC4g5o=
 github.com/to404hanga/online_judge_common v0.0.18/go.mod h1:9Ays/uVxkrZugD0VMicAR7iSSRODsm0d6YAerrzyJPc=
-github.com/to404hanga/online_judge_controller v0.0.3 h1:CTKB8NnVo1u8Wauk86FbsngnnXEe+csXH5+xazG6ulc=
-github.com/to404hanga/online_judge_controller v0.0.3/go.mod h1:+ac5/dzgdtrXWmDwf8xvk/fjul5UMNdKBKw9waUw+AU=
+github.com/to404hanga/online_judge_controller v0.0.5 h1:nQdkUCyXixkVeeHQ7PnJNZ14AQWX+bW1TuBJ/p9OciA=
+github.com/to404hanga/online_judge_controller v0.0.5/go.mod h1:qEDTzOSdXQ8EqRuFfPr8R3A3XpchiEHtZNUw6yZrUH8=
 github.com/to404hanga/pkg404 v0.0.35 h1:wOZjTaauoOMBGJ8QtrSxZbZ2gNZcj81147USTBm41+I=
 github.com/to404hanga/pkg404 v0.0.35/go.mod h1:ZJVpQFW/NZtgshGqyCwZ7Te7uD8g3/1Js94M9almKj0=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=

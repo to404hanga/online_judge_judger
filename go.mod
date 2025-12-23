@@ -8,11 +8,11 @@ require (
 	github.com/google/wire v0.7.0
 	github.com/moby/moby/api v1.52.0-rc.1
 	github.com/moby/moby/client v0.1.0-rc.1
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/to404hanga/online_judge_common v0.0.18
-	github.com/to404hanga/online_judge_controller v0.0.3
+	github.com/to404hanga/online_judge_controller v0.0.5
 	github.com/to404hanga/pkg404 v0.0.35
 	google.golang.org/protobuf v1.36.10
 	gorm.io/driver/mysql v1.6.0
