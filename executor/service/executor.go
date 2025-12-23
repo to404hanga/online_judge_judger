@@ -19,6 +19,7 @@ import (
 	"github.com/moby/moby/api/types/container"
 	"github.com/moby/moby/client"
 	ojmodel "github.com/to404hanga/online_judge_common/model"
+	"github.com/to404hanga/online_judge_controller/pkg/pointer"
 	"github.com/to404hanga/online_judge_judger/executor/config"
 	"github.com/to404hanga/pkg404/logger"
 	loggerv2 "github.com/to404hanga/pkg404/logger/v2"
@@ -314,10 +315,14 @@ func (e *DockerExecutor) Close() error {
 	for _, ch := range e.containerPool {
 		close(ch)
 		for id := range ch {
-			if _, err := e.client.ContainerStop(ctx, id, client.ContainerStopOptions{}); err != nil {
+			if _, err := e.client.ContainerStop(ctx, id, client.ContainerStopOptions{
+				Timeout: pointer.ToPtr(0),
+			}); err != nil {
 				e.log.ErrorContext(ctx, "stop container failed", logger.String("containerID", id), logger.Error(err))
 			}
-			if _, err := e.client.ContainerRemove(ctx, id, client.ContainerRemoveOptions{}); err != nil {
+			if _, err := e.client.ContainerRemove(ctx, id, client.ContainerRemoveOptions{
+				Force: true,
+			}); err != nil {
 				e.log.ErrorContext(ctx, "remove container failed", logger.String("containerID", id), logger.Error(err))
 			}
 		}
