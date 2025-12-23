@@ -12,7 +12,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/to404hanga/online_judge_common v0.0.18
-	github.com/to404hanga/online_judge_controller v0.0.5
+	github.com/to404hanga/online_judge_controller v0.0.6
 	github.com/to404hanga/pkg404 v0.0.35
 	google.golang.org/protobuf v1.36.10
 	gorm.io/driver/mysql v1.6.0
