@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
+	"github.com/prometheus/client_golang/prometheus"
 	ojmodel "github.com/to404hanga/online_judge_common/model"
 	ojconstants "github.com/to404hanga/online_judge_common/proto/constants"
 	pbjudgeresult "github.com/to404hanga/online_judge_common/proto/gen/judgeresult"
@@ -22,6 +23,38 @@ import (
 const (
 	ResultCollectorGroupID = "result_collector_group"
 )
+
+var (
+	resultCollectorHandleInFlight = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "online_judge",
+		Subsystem: "resultcollector",
+		Name:      "handle_result_in_flight",
+		Help:      "Current number of in-flight handleResult operations.",
+	})
+
+	resultCollectorHandleTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "online_judge",
+		Subsystem: "resultcollector",
+		Name:      "handle_result_total",
+		Help:      "Total number of handleResult operations.",
+	}, []string{"result", "reason"})
+
+	resultCollectorHandleDurationSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: "online_judge",
+		Subsystem: "resultcollector",
+		Name:      "handle_result_duration_seconds",
+		Help:      "Duration of handleResult operations in seconds.",
+		Buckets:   prometheus.ExponentialBuckets(0.005, 2, 16),
+	}, []string{"result"})
+)
+
+func init() {
+	prometheus.MustRegister(
+		resultCollectorHandleInFlight,
+		resultCollectorHandleTotal,
+		resultCollectorHandleDurationSeconds,
+	)
+}
 
 type ResultCollectorService struct {
 	log        loggerv2.Logger
@@ -46,10 +79,23 @@ func (s *ResultCollectorService) Start(ctx context.Context) error {
 	return s.consumer.Start(ctx)
 }
 
-func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.ConsumerMessage) error {
+func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.ConsumerMessage) (err error) {
+	opStartTime := time.Now()
+	result := "success"
+	reason := "ok"
+
+	resultCollectorHandleInFlight.Inc()
+	defer func() {
+		resultCollectorHandleInFlight.Dec()
+		resultCollectorHandleTotal.WithLabelValues(result, reason).Inc()
+		resultCollectorHandleDurationSeconds.WithLabelValues(result).Observe(time.Since(opStartTime).Seconds())
+	}()
+
 	var pbs pbjudgeresult.JudgeResult
-	err := proto.Unmarshal(msg.Value, &pbs)
+	err = proto.Unmarshal(msg.Value, &pbs)
 	if err != nil {
+		result = "error"
+		reason = "unmarshal_judge_result"
 		s.log.ErrorContext(ctx, "failed to unmarshal judge result", logger.Error(err))
 		return fmt.Errorf("failed to unmarshal judge result: %w", err)
 	}
@@ -79,6 +125,8 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		result = "error"
+		reason = "db_update_submission"
 		s.log.ErrorContext(ctx, "failed to update submission", logger.Error(err))
 		return fmt.Errorf("failed to update submission: %w", err)
 	}
@@ -96,6 +144,8 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		result = "error"
+		reason = "db_get_submission"
 		s.log.ErrorContext(ctx, "failed to get submission", logger.Error(err))
 		return fmt.Errorf("failed to get submission: %w", err)
 	}
@@ -111,6 +161,8 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		result = "error"
+		reason = "update_competition_user"
 		s.log.ErrorContext(ctx, "failed to update competition user", logger.Error(err))
 		return fmt.Errorf("failed to update competition user: %w", err)
 	}
@@ -132,6 +184,8 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		result = "error"
+		reason = "update_user_score"
 		s.log.ErrorContext(ctx, "failed to update user score", logger.Error(err))
 		return fmt.Errorf("failed to update user score: %w", err)
 	}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/redis/go-redis/v9"
 	ojmodel "github.com/to404hanga/online_judge_common/model"
 	ojconstants "github.com/to404hanga/online_judge_common/proto/constants"
@@ -27,6 +28,38 @@ import (
 const (
 	groupName = "judger_group"
 )
+
+var (
+	workerProcessMessageInFlight = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "online_judge",
+		Subsystem: "worker",
+		Name:      "process_message_in_flight",
+		Help:      "Current number of in-flight processMessage operations.",
+	})
+
+	workerProcessMessageTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "online_judge",
+		Subsystem: "worker",
+		Name:      "process_message_total",
+		Help:      "Total number of processMessage operations.",
+	}, []string{"result", "reason"})
+
+	workerProcessMessageDurationSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: "online_judge",
+		Subsystem: "worker",
+		Name:      "process_message_duration_seconds",
+		Help:      "Duration of processMessage operations in seconds.",
+		Buckets:   prometheus.ExponentialBuckets(0.005, 2, 16),
+	}, []string{"result"})
+)
+
+func init() {
+	prometheus.MustRegister(
+		workerProcessMessageInFlight,
+		workerProcessMessageTotal,
+		workerProcessMessageDurationSeconds,
+	)
+}
 
 type JudgeService struct {
 	log                loggerv2.Logger
@@ -103,7 +136,18 @@ func (s *JudgeService) Start(ctx context.Context) error {
 	}
 }
 
-func (s *JudgeService) processMessage(ctx context.Context, msg *redis.XMessage) error {
+func (s *JudgeService) processMessage(ctx context.Context, msg *redis.XMessage) (err error) {
+	startTime := time.Now()
+	result := "success"
+	reason := "ok"
+
+	workerProcessMessageInFlight.Inc()
+	defer func() {
+		workerProcessMessageInFlight.Dec()
+		workerProcessMessageTotal.WithLabelValues(result, reason).Inc()
+		workerProcessMessageDurationSeconds.WithLabelValues(result).Observe(time.Since(startTime).Seconds())
+	}()
+
 	var taskData []byte
 	switch v := msg.Values["task"].(type) {
 	case string:
@@ -111,19 +155,25 @@ func (s *JudgeService) processMessage(ctx context.Context, msg *redis.XMessage) 
 	case []byte:
 		taskData = v
 	default:
+		result = "error"
+		reason = "invalid_task_field_type"
 		s.log.ErrorContext(ctx, "task field is not []byte or string", logger.String("type", fmt.Sprintf("%T", v)))
 		return fmt.Errorf("task field is not []byte or string, type: %T", v)
 	}
 
 	var task judgetask.JudgeTask
-	err := proto.Unmarshal(taskData, &task)
+	err = proto.Unmarshal(taskData, &task)
 	if err != nil {
+		result = "error"
+		reason = "unmarshal_task"
 		s.log.ErrorContext(ctx, "failed to unmarshal task", logger.Error(err))
 		return fmt.Errorf("failed to unmarshal task: %w", err)
 	}
 	ctx = loggerv2.ContextWithFields(ctx, logger.String("RequestID", task.RequestId))
 
 	if err = s.handleJudgeTask(ctx, &task); err != nil {
+		result = "error"
+		reason = "handle_judge_task"
 		s.log.ErrorContext(ctx, "failed to handle judge task", logger.Error(err))
 		return fmt.Errorf("failed to handle judge task: %w", err)
 	}
@@ -131,6 +181,8 @@ func (s *JudgeService) processMessage(ctx context.Context, msg *redis.XMessage) 
 	if err = retry.Do(ctx, func() error {
 		return s.rdb.XAck(ctx, constants.JudgeTaskKey, groupName, msg.ID).Err()
 	}); err != nil {
+		result = "error"
+		reason = "redis_xack"
 		s.log.ErrorContext(ctx, "failed to ack message", logger.Error(err))
 		return fmt.Errorf("failed to ack message: %w", err)
 	}
