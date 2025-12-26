@@ -50,8 +50,10 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 	var pbs pbjudgeresult.JudgeResult
 	err := proto.Unmarshal(msg.Value, &pbs)
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to unmarshal judge result", logger.Error(err))
 		return fmt.Errorf("failed to unmarshal judge result: %w", err)
 	}
+	ctx = loggerv2.ContextWithFields(ctx, logger.String("RequestID", pbs.RequestId))
 
 	updates := map[string]any{
 		"result":      int8(pbs.Result),
@@ -71,11 +73,13 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 			Where("id = ?", pbs.SubmissionId).
 			Updates(updates).Error
 		if errInternal != nil {
+			s.log.ErrorContext(collectorCtx, "failed to update submission", logger.Error(errInternal))
 			return fmt.Errorf("failed to update submission: %w", errInternal)
 		}
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to update submission", logger.Error(err))
 		return fmt.Errorf("failed to update submission: %w", err)
 	}
 
@@ -86,11 +90,13 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 			Select("competition_id", "problem_id", "user_id", "created_at").
 			First(&submission).Error
 		if errInternal != nil {
+			s.log.ErrorContext(collectorCtx, "failed to get submission", logger.Error(errInternal))
 			return fmt.Errorf("failed to get submission: %w", errInternal)
 		}
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to get submission", logger.Error(err))
 		return fmt.Errorf("failed to get submission: %w", err)
 	}
 
@@ -98,12 +104,14 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 	err = retry.Do(collectorCtx, func() error {
 		t, errInternal := s.updateCompetitionUser(collectorCtx, submission.CompetitionID, submission.UserID, ojmodel.SubmissionResult(pbs.Result) == ojmodel.SubmissionResultAccepted, submission.CreatedAt)
 		if errInternal != nil {
+			s.log.ErrorContext(collectorCtx, "failed to update competition user", logger.Error(errInternal))
 			return fmt.Errorf("failed to update competition user: %w", errInternal)
 		}
 		startTime = t
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to update competition user", logger.Error(err))
 		return fmt.Errorf("failed to update competition user: %w", err)
 	}
 
@@ -118,11 +126,13 @@ func (s *ResultCollectorService) handleResult(ctx context.Context, msg *sarama.C
 			startTime,
 		)
 		if errInternal != nil {
+			s.log.ErrorContext(collectorCtx, "ffailed to update user score", logger.Error(errInternal))
 			return fmt.Errorf("failed to update user score: %w", errInternal)
 		}
 		return nil
 	}, retry.WithBaseInterval(time.Second))
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to update user score", logger.Error(err))
 		return fmt.Errorf("failed to update user score: %w", err)
 	}
 

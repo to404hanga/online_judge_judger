@@ -13,6 +13,7 @@ import (
 	"github.com/to404hanga/online_judge_judger/constants"
 	"github.com/to404hanga/online_judge_judger/consumer"
 	"github.com/to404hanga/pkg404/cachex/lru"
+	"github.com/to404hanga/pkg404/logger"
 	loggerv2 "github.com/to404hanga/pkg404/logger/v2"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
@@ -55,8 +56,10 @@ func (s *SubmissionService) Start(ctx context.Context) error {
 func (s *SubmissionService) handleSubmission(ctx context.Context, msg *sarama.ConsumerMessage) error {
 	var pbs pbsubmission.Submission
 	if err := proto.Unmarshal(msg.Value, &pbs); err != nil {
+		s.log.ErrorContext(ctx, "failed to unmarshal submission", logger.Error(err))
 		return fmt.Errorf("failed to unmarshal submission: %w", err)
 	}
+	ctx = loggerv2.ContextWithFields(ctx, logger.String("RequestID", pbs.RequestId))
 
 	var submission ojmodel.Submission
 	err := s.db.WithContext(ctx).Model(&ojmodel.Submission{}).
@@ -64,6 +67,7 @@ func (s *SubmissionService) handleSubmission(ctx context.Context, msg *sarama.Co
 		Select("problem_id", "code", "language").
 		First(&submission).Error
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to get submission", logger.Error(err))
 		return fmt.Errorf("failed to get submission: %w", err)
 	}
 
@@ -77,6 +81,7 @@ func (s *SubmissionService) handleSubmission(ctx context.Context, msg *sarama.Co
 			Select("time_limit", "memory_limit").
 			First(&problem).Error
 		if err != nil {
+			s.log.ErrorContext(ctx, "failed to get problem", logger.Error(err))
 			return fmt.Errorf("failed to get problem: %w", err)
 		}
 		s.lru.Add(lruKey, problem)
@@ -89,9 +94,11 @@ func (s *SubmissionService) handleSubmission(ctx context.Context, msg *sarama.Co
 		Language:     int32(submission.Language.Int8()),
 		TimeLimit:    int32(problem.TimeLimit),
 		MemoryLimit:  int32(problem.MemoryLimit),
+		RequestId:    pbs.RequestId,
 	}
 	taskBytes, err := proto.Marshal(task)
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to marshal judge task", logger.Error(err))
 		return fmt.Errorf("failed to marshal judge task: %w", err)
 	}
 
@@ -102,6 +109,7 @@ func (s *SubmissionService) handleSubmission(ctx context.Context, msg *sarama.Co
 		},
 	}).Err()
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to add judge task to stream", logger.Error(err))
 		return fmt.Errorf("failed to add judge task to stream: %w", err)
 	}
 	return nil

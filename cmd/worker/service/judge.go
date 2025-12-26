@@ -111,22 +111,27 @@ func (s *JudgeService) processMessage(ctx context.Context, msg *redis.XMessage) 
 	case []byte:
 		taskData = v
 	default:
+		s.log.ErrorContext(ctx, "task field is not []byte or string", logger.String("type", fmt.Sprintf("%T", v)))
 		return fmt.Errorf("task field is not []byte or string, type: %T", v)
 	}
 
 	var task judgetask.JudgeTask
 	err := proto.Unmarshal(taskData, &task)
 	if err != nil {
+		s.log.ErrorContext(ctx, "failed to unmarshal task", logger.Error(err))
 		return fmt.Errorf("failed to unmarshal task: %w", err)
 	}
+	ctx = loggerv2.ContextWithFields(ctx, logger.String("RequestID", task.RequestId))
 
 	if err = s.handleJudgeTask(ctx, &task); err != nil {
+		s.log.ErrorContext(ctx, "failed to handle judge task", logger.Error(err))
 		return fmt.Errorf("failed to handle judge task: %w", err)
 	}
 
 	if err = retry.Do(ctx, func() error {
 		return s.rdb.XAck(ctx, constants.JudgeTaskKey, groupName, msg.ID).Err()
 	}); err != nil {
+		s.log.ErrorContext(ctx, "failed to ack message", logger.Error(err))
 		return fmt.Errorf("failed to ack message: %w", err)
 	}
 
