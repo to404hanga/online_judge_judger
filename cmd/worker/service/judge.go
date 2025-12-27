@@ -31,21 +31,21 @@ const (
 
 var (
 	workerProcessMessageInFlight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "worker",
 		Name:      "process_message_in_flight",
 		Help:      "Current number of in-flight processMessage operations.",
 	})
 
 	workerProcessMessageTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "worker",
 		Name:      "process_message_total",
 		Help:      "Total number of processMessage operations.",
 	}, []string{"result", "reason"})
 
 	workerProcessMessageDurationSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "worker",
 		Name:      "process_message_duration_seconds",
 		Help:      "Duration of processMessage operations in seconds.",
