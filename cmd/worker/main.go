@@ -40,7 +40,7 @@ func main() {
 	mux.Handle("/metrics", promhttp.Handler())
 
 	srv := &http.Server{
-		Addr:    "/:2112",
+		Addr:    ":2112",
 		Handler: mux,
 	}
 
