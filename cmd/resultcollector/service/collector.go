@@ -26,22 +26,22 @@ const (
 
 var (
 	resultCollectorHandleInFlight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace: "online_judge",
-		Subsystem: "resultcollector",
+		Namespace: "online_judge_judger",
+		Subsystem: "result_collector",
 		Name:      "handle_result_in_flight",
 		Help:      "Current number of in-flight handleResult operations.",
 	})
 
 	resultCollectorHandleTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "online_judge",
-		Subsystem: "resultcollector",
+		Namespace: "online_judge_judger",
+		Subsystem: "result_collector",
 		Name:      "handle_result_total",
 		Help:      "Total number of handleResult operations.",
 	}, []string{"result", "reason"})
 
 	resultCollectorHandleDurationSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "online_judge",
-		Subsystem: "resultcollector",
+		Namespace: "online_judge_judger",
+		Subsystem: "result_collector",
 		Name:      "handle_result_duration_seconds",
 		Help:      "Duration of handleResult operations in seconds.",
 		Buckets:   prometheus.ExponentialBuckets(0.005, 2, 16),

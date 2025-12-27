@@ -28,21 +28,21 @@ const (
 
 var (
 	submissionHandleInFlight = prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "master",
 		Name:      "submission_handle_in_flight",
 		Help:      "Current number of in-flight submission handle operations.",
 	})
 
 	submissionHandleTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "master",
 		Name:      "submission_handle_total",
 		Help:      "Total number of submission handle operations.",
 	}, []string{"result", "reason"})
 
 	submissionHandleDurationSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "master",
 		Name:      "submission_handle_duration_seconds",
 		Help:      "Duration of submission handle operations in seconds.",
@@ -50,7 +50,7 @@ var (
 	}, []string{"result", "problem_cache"})
 
 	submissionProblemCacheTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "online_judge",
+		Namespace: "online_judge_judger",
 		Subsystem: "master",
 		Name:      "problem_cache_total",
 		Help:      "Total number of problem cache lookups.",
